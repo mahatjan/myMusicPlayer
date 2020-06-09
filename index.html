@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div id="app-music">
+        <!-- //播放器主窗口 -->
+        <div class="video-box " :class="{show:mvisplaying}">
+            <div class="mask" @click="close"></div>
+            <video @play="mvplay" ref="video" :src="videoURL" controls autoplay ></video>
+        </div>
+        <div id="app-music-box">
+
+            <!-- 搜索栏开始 -->
+            <div class="music-search-box">
+                <div class="search-left">泽林音乐播放器</div>
+                <div class="search-right">
+                    <input type="text" v-model="keywords" @keydown.enter="searchSongs">
+                </div>
+            </div>
+            <!-- 搜索栏结束 -->
+
+
+            <!-- 主体内容开始 -->
+            <div class="music-contect">
+                <div class="content-left">
+                    <ul class="songs-list">
+                        <li class="songs-item" v-for="item,index in songs">
+                            <span @click="playSongs(index)" class="songs-logo"></span>
+                            <span class="songs-name" @click="playSongs(index)">{{item.name}}</span>
+                            <span @click="playvideo(index)" :class="['video-logo',{hidden:item.mvid===0}]"></span>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="content-middle">
+                    <img :class="['player-bar',{playingbar:isplaying}]" src="./imgs/player_bar.png" alt="">
+                    <img :class="['disk',{playing:isplaying}]"  src="./imgs/disc.png" alt="">
+                    <img :class="['cover',{playing:isplaying}]" :src="cover.picUrl" alt="">
+                </div>
+
+
+                
+                <div class="content-right">
+                    <span class="hot-comment">热门评论</span>
+                    <ul class="comment">
+                        <li class="comment-item" v-for="item,index in hotComments"  >
+                            <div class="avatar"><img :src="item.user.avatarUrl" alt=""></div>
+                            <div class="text">
+                                <span class="usr-name">{{item.user.nickname}}</span>
+                                <p class="comment-text">
+                                    {{item.content}}
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- 主体内容结束 -->
+
+            <!--底部播放器开始-->
+            <div class="music-footer">
+                <audio id="" ref="audio"  @pause="pause"  @play="play" :src="musicURL" autoplay loop="false" controls="false" poster="" name="未知音频" author="未知作者"
+                    binderror="" bindplay="" bindpause="" bindtimeupdate="" bindended="">
+                </audio>
+            </div>
+            <!-- 底部播放器结束 -->
+        </div>
+    </div>
+</body>
+<script src="./node_modules/vue/dist/vue.js"></script>
+<script src="./node_modules/axios/dist/axios.js"></script>
+<script src="./js/common.js"></script>
+<script>
+    let vm = new Vue({
+        el: "#app-music",
+        data: {
+            songs: [],
+            inpuValue: "",
+            keywords: "热门",
+            musicID: "",
+            musicURL: "",
+            videoID:"",
+            videoURL:"",
+            hotComments:[],
+            cover:"",
+            isplaying:false,
+            mvisplaying:false
+        },
+        mounted() {
+            this.searchSongs()
+
+
+
+
+
+
+        },
+        methods: {
+            playSongs: function (index) {
+                this.musicID = this.songs[index].id
+                Axios.get("/song/url", {
+                    params: {
+                        id: this.musicID
+                    }
+                }).then((res) => {
+                    // console.log(res.data.data[0].url)
+                    // // this.musicURL=res.data.data[index].url
+                    this.musicURL = res.data.data[0].url
+                    console.log(this.musicURL);
+
+
+                })
+
+                Axios.get("/comment/hot?type=0", {
+
+                    params: {
+                        id: this.musicID
+                    }
+                }).then((res) => {
+                    // this.songs = res.data.result.songs
+                    // console.log(res.data.hotComments);
+                    this.hotComments=res.data.hotComments
+                    console.log(this.hotComments)
+
+                })
+
+                Axios.get("/song/detail", {
+                    params: {
+                        ids: this.musicID
+                    }
+                }).then((res) => {
+             
+                    // console.log("hahahah",res);
+                    // console.log(res.data.songs[0].al);
+                    this.cover=res.data.songs[0].al
+                    console.log(this.cover.picUrl);
+                    
+                    
+                    
+
+
+                })
+
+
+            },
+            searchSongs: function () {
+                console.log(this.keywords);
+                Axios.get("/search", {
+
+                    params: {
+                        keywords: this.keywords
+                    }
+                }).then((res) => {
+                    this.songs = res.data.result.songs
+
+
+                })
+
+
+
+
+
+            },
+            play:function(e){
+                this.isplaying=true
+            },
+            pause:function(e){
+                this.isplaying=false
+            },
+            playvideo:function(index){
+                this.videoID=this.songs[index].mvid
+                Axios.get("/mv/url",{
+                    params:{
+                        id:this.videoID
+                    }
+                }).then((res)=>{
+                    console.log(res.data.data.url);
+                    this.videoURL=res.data.data.url
+                    
+                })
+                this.$refs.audio.pause()
+            },
+            mvplay:function(){
+                this.mvisplaying=true
+            },
+            mvpause:function(){
+                this.mvisplaying=false
+            },
+            close:function(){
+                this.mvisplaying=false
+                this.$refs.video.pause()
+                
+            }
+
+        },
+
+    })
+</script>
+
+</html>
