@@ -13,13 +13,13 @@
         <!-- //播放器主窗口 -->
         <div class="video-box " :class="{show:mvisplaying}">
             <div class="mask" @click="close"></div>
-            <video @play="mvplay" ref="video" :src="videoURL" controls autoplay ></video>
+            <video @play="mvplay" ref="video" :src="videoURL" controls autoplay></video>
         </div>
         <div id="app-music-box">
 
             <!-- 搜索栏开始 -->
             <div class="music-search-box">
-                <div class="search-left">泽林音乐播放器</div>
+                <div class="search-left">我的音乐播放器</div>
                 <div class="search-right">
                     <input type="text" v-model="keywords" @keydown.enter="searchSongs">
                 </div>
@@ -42,16 +42,16 @@
 
                 <div class="content-middle">
                     <img :class="['player-bar',{playingbar:isplaying}]" src="./imgs/player_bar.png" alt="">
-                    <img :class="['disk',{playing:isplaying}]"  src="./imgs/disc.png" alt="">
+                    <img :class="['disk',{playing:isplaying}]" src="./imgs/disc.png" alt="">
                     <img :class="['cover',{playing:isplaying}]" :src="cover.picUrl" alt="">
                 </div>
 
 
-                
+
                 <div class="content-right">
                     <span class="hot-comment">热门评论</span>
                     <ul class="comment">
-                        <li class="comment-item" v-for="item,index in hotComments"  >
+                        <li class="comment-item" v-for="item,index in hotComments">
                             <div class="avatar"><img :src="item.user.avatarUrl" alt=""></div>
                             <div class="text">
                                 <span class="usr-name">{{item.user.nickname}}</span>
@@ -67,8 +67,9 @@
 
             <!--底部播放器开始-->
             <div class="music-footer">
-                <audio id="" ref="audio"  @pause="pause"  @play="play" :src="musicURL" autoplay loop="false" controls="false" poster="" name="未知音频" author="未知作者"
-                    binderror="" bindplay="" bindpause="" bindtimeupdate="" bindended="">
+                <audio id="" ref="audio" @pause="pause" @play="play" :src="musicURL" autoplay loop="false"
+                    controls="false" poster="" name="未知音频" author="未知作者" binderror="" bindplay="" bindpause=""
+                    bindtimeupdate="" bindended="">
                 </audio>
             </div>
             <!-- 底部播放器结束 -->
@@ -87,21 +88,15 @@
             keywords: "热门",
             musicID: "",
             musicURL: "",
-            videoID:"",
-            videoURL:"",
-            hotComments:[],
-            cover:"",
-            isplaying:false,
-            mvisplaying:false
+            videoID: "",
+            videoURL: "",
+            hotComments: [],
+            cover: "",
+            isplaying: false,
+            mvisplaying: false
         },
         mounted() {
             this.searchSongs()
-
-
-
-
-
-
         },
         methods: {
             playSongs: function (index) {
@@ -127,7 +122,7 @@
                 }).then((res) => {
                     // this.songs = res.data.result.songs
                     // console.log(res.data.hotComments);
-                    this.hotComments=res.data.hotComments
+                    this.hotComments = res.data.hotComments
                     console.log(this.hotComments)
 
                 })
@@ -137,16 +132,11 @@
                         ids: this.musicID
                     }
                 }).then((res) => {
-             
+
                     // console.log("hahahah",res);
                     // console.log(res.data.songs[0].al);
-                    this.cover=res.data.songs[0].al
+                    this.cover = res.data.songs[0].al
                     console.log(this.cover.picUrl);
-                    
-                    
-                    
-
-
                 })
 
 
@@ -164,40 +154,36 @@
 
                 })
 
-
-
-
-
             },
-            play:function(e){
-                this.isplaying=true
+            play: function (e) {
+                this.isplaying = true
             },
-            pause:function(e){
-                this.isplaying=false
+            pause: function (e) {
+                this.isplaying = false
             },
-            playvideo:function(index){
-                this.videoID=this.songs[index].mvid
-                Axios.get("/mv/url",{
-                    params:{
-                        id:this.videoID
+            playvideo: function (index) {
+                this.videoID = this.songs[index].mvid
+                Axios.get("/mv/url", {
+                    params: {
+                        id: this.videoID
                     }
-                }).then((res)=>{
+                }).then((res) => {
                     console.log(res.data.data.url);
-                    this.videoURL=res.data.data.url
-                    
+                    this.videoURL = res.data.data.url
+
                 })
                 this.$refs.audio.pause()
             },
-            mvplay:function(){
-                this.mvisplaying=true
+            mvplay: function () {
+                this.mvisplaying = true
             },
-            mvpause:function(){
-                this.mvisplaying=false
+            mvpause: function () {
+                this.mvisplaying = false
             },
-            close:function(){
-                this.mvisplaying=false
+            close: function () {
+                this.mvisplaying = false
                 this.$refs.video.pause()
-                
+
             }
 
         },
