@@ -11,6 +11,9 @@
 <body>
     <div id="app-music">
         <!-- //播放器主窗口 -->
+        <div :class="['loading',{show:isLoading}]">
+            <img src="./imgs/loading.gif" alt="">
+        </div>
         <div class="video-box " :class="{show:mvisplaying}">
             <div class="mask" @click="close"></div>
             <video @play="mvplay" ref="video" :src="videoURL" controls autoplay></video>
@@ -93,7 +96,8 @@
             hotComments: [],
             cover: "",
             isplaying: false,
-            mvisplaying: false
+            mvisplaying: false,
+            isLoading:false
         },
         mounted() {
             this.searchSongs()
